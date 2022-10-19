@@ -3,10 +3,11 @@
 import os
 import ovh
 import sys
-import json
 import yaml
 import requests
 import time
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 
 class OVHIpUpdate:
@@ -14,7 +15,24 @@ class OVHIpUpdate:
         self.current_ip_file = "/tmp/current_ip.yaml"
         self.record_changed = 0
         self.settings = self.load_config()
+        self.logger = self.get_logger("/tmp/ovh-dns-updater.log")
         self.client = ovh.Client(**self.settings["ovh"])
+
+    def get_logger(self, path):
+        logger = logging.getLogger("MAIN")
+        logger.setLevel(logging.INFO)
+        
+        handler = TimedRotatingFileHandler(path,
+                                       when="d",
+                                       interval=1,
+                                       backupCount=5)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        
+        logger.addHandler(handler)
+        
+        return logger
+
 
     def load_config(self):
         conf_file_path = os.path.join(os.path.dirname(
@@ -50,8 +68,8 @@ class OVHIpUpdate:
                 ip = r.text
                 break
             else:
-                message += "{} : Cannot get IPv{} from {}: requests.get returned status_code {}.\n".format(
-                    self.timestamp(), v, url, r.status_code)
+                message += "Cannot get IPv{} from {}: requests.get returned status_code {}.\n".format(
+                    v, url, r.status_code)
         if ip != "":
             return ip
         elif v in self.settings["ip_versions_required"]:
@@ -63,10 +81,7 @@ class OVHIpUpdate:
             return False
 
     def log(self, msg):
-        print("{}: {}".format(self.timestamp(), msg))
-
-    def timestamp(self):
-        return time.asctime(time.localtime(time.time()))
+        self.logger.info(msg)
 
     def update_record(self, domain, subdomain, new_ip, _ttl=600):
         # Update the (A or AAAA) record with the provided IP
@@ -94,8 +109,8 @@ class OVHIpUpdate:
                                      )
             record_id = result[0]
             self.record_changed += 1
-            self.log("{} : ### created new record {} for {}.{}".format(
-                self.timestamp(), typ, subdomain, domain))
+            self.log("### created new record {} for {}.{}".format(
+                typ, subdomain, domain))
         else:
             # record exists
             record_id = result[0]
@@ -136,8 +151,8 @@ class OVHIpUpdate:
         if len(result) == 1:
             # record exists, delete it
             record_id = result[0]
-            self.log("{} : ### deleting record {} for {}.{}".format(
-                self.timestamp(), typ, subdomain, domain))
+            self.log("### deleting record {} for {}.{}".format(
+                typ, subdomain, domain))
             self.client.delete(
                 "/domain/zone/{}/record/{}".format(domain, record_id))
             self.client.post('/domain/zone/{}/refresh'.format(domain))
@@ -188,14 +203,14 @@ class OVHIpUpdate:
                             subdomain, domain))
                         pass
                 # all self.settings["hosts"] records have been updated without errors, log change and save current addresses
-                self.log("{} : new addresses {} ; {} -- {} records updates".format(
-                    self.timestamp(), current_ipv4, current_ipv6, self.record_changed))
+                self.log("new addresses {} ; {} -- {} records updates".format(
+                    current_ipv4, current_ipv6, self.record_changed))
                 with open(self.current_ip_file, 'w') as _file:
                     yaml.dump([time.time(), current_ipv4, current_ipv6], _file)
             # some error occured (API down, keys expired...?),
             except Exception as e:
-                msg = "{} : ### error {} while updating records!! {} records updated with new addresses {} ; {}".format(
-                    self.timestamp(),  str(e), self.record_changed, current_ipv4, current_ipv6)
+                msg = "{} : ### error {} while updating records!! records updated with new addresses {} ; {}".format(
+                    str(e), self.record_changed, current_ipv4, current_ipv6)
                 self.log(msg)
                 # not saving new addresses, so that update is attempted again.
         else:

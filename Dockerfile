@@ -15,4 +15,3 @@ COPY supervisord.conf /etc/
 VOLUME /src/config
 
 CMD ["/bin/bash", "-c", "exec supervisord"]
-#CMD ["-c", "nohup python3 src/ovh-ip-update.py; /bin/bash"]
