@@ -1,0 +1,20 @@
+FROM debian:bullseye
+
+RUN apt-get update && apt-get install --no-install-recommends supervisor python3 python3-pip -y && rm -rf /var/lib/apt/lists
+
+ENV SLEEP_TIME=300
+COPY requirements.txt .
+RUN python3 -m pip install -r requirements.txt
+
+RUN mkdir /src/
+COPY src/ovh-ip-update.py /src/
+COPY src/run.sh /src/
+
+RUN chmod +x /src/run.sh
+RUN mkdir /src/config
+COPY supervisord.conf /etc/
+
+VOLUME /src/config
+
+CMD ["/bin/bash", "-c", "exec supervisord"]
+#CMD ["-c", "nohup python3 src/ovh-ip-update.py; /bin/bash"]
