@@ -1,4 +1,3 @@
 ovh
 pyyaml
 requests
-supervisor-stdout
