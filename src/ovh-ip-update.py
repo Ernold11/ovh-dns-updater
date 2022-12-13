@@ -28,8 +28,13 @@ class OVHIpUpdate:
                                        backupCount=5)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
-        
+
         logger.addHandler(handler)
+        
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setFormatter(formatter)
+        
+        logger.addHandler(stdout_handler)
         
         return logger
 
