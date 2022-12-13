@@ -12,6 +12,8 @@ COPY src/ovh-ip-update.py /src/
 RUN mkdir /src/config
 COPY supervisord.conf /etc/
 
+COPY supervisor_stdout.py /usr/local/lib/python3.9/dist-packages/supervisor_stdout.py
+
 VOLUME /src/config
 
 CMD ["/bin/bash", "-c", "exec supervisord"]
