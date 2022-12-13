@@ -121,7 +121,7 @@ class OVHIpUpdate:
             record_id = result[0]
             path = "/domain/zone/{}/record/{}".format(domain, record_id)
             result = self.client.get(path)
-            oldip = result['target']
+            oldip = result['target'].strip()
             self.log('record exists, with ip: {}'.format(oldip))
             if oldip == new_ip:
                 self.log('nothing to do')
@@ -183,7 +183,7 @@ class OVHIpUpdate:
                 for host, values in self.settings["hosts"].items():
                     domain = values["domain"]
                     for subdomain in values["subdomains"]:
-                        self.log("Updating {} subdomain".format(subdomain))
+                        self.log("\nUpdating {} subdomain".format(subdomain))
                         if ('ipv4' in values) and (values['ipv4'] != False):
                             if current_ipv4:
                                 ttl = self.settings["default_ttl"] if (
