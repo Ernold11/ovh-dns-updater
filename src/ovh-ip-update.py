@@ -178,7 +178,7 @@ class OVHIpUpdate:
                 for host, values in self.settings["hosts"].items():
                     domain = values["domain"]
                     for subdomain in values["subdomains"]:
-                        self.log("#"*100)
+                        self.log("#"*80)
                         self.log("Updating {} subdomain".format(subdomain))
                         if ('ipv4' in values) and (values['ipv4'] != False):
                             if current_ipv4:
