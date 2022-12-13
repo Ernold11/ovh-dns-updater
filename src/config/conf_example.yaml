@@ -9,7 +9,7 @@ checkDNS_interval_hrs: 12.1 # when the saved IP addresses are old, check the DNS
 hosts: 
     host_1:
         domain: "host", # Required
-        subdomain: "", # Required. Explicit subdomain or empty string "" (for @) or "*" for wildcard
+        subdomains: [""], # Required. list of subdomains or one element list "" (for @) or "*" for wildcard
         #"ipv6": any_value_except_False # Optional : maintain corresponding record, when possible
         ipv4: True, #explicitly disable modifiying ipv4 (A) records, even if public IPV4 exists (a possibly erroneous record would be left as-is)
         #"ttl": 60 # optional : if 'ttl' in specified in host, overrides the global default value
