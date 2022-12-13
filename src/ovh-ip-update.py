@@ -210,7 +210,7 @@ class OVHIpUpdate:
                     yaml.dump([time.time(), current_ipv4, current_ipv6], _file)
             # some error occured (API down, keys expired...?),
             except Exception as e:
-                msg = "{} : ### error {} while updating records!! records updated with new addresses {} ; {}".format(
+                msg = "Error while updating records: {} ; Records updated with new addresses: {} ipv4: {} ipv6: {}".format(
                     str(e), self.record_changed, current_ipv4, current_ipv6)
                 self.log(msg)
                 # not saving new addresses, so that update is attempted again.
