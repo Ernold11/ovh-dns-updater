@@ -52,7 +52,7 @@ class OVHIpUpdate:
             self.update_record_if_needed()
             self.log("Sleep {}s".format(sleep_time))
             time.sleep(sleep_time)
-            self.log("#"*80)
+            self.log("#"*70)
 
     def get_current_ip(self, v=4):
         if v == 4:
@@ -184,7 +184,7 @@ class OVHIpUpdate:
                 for host, values in self.settings["hosts"].items():
                     domain = values["domain"]
                     for subdomain in values["subdomains"]:
-                        self.log("#"*80)
+                        self.log("#"*70)
                         self.log("Updating '{}' subdomain".format(subdomain))
                         if ('ipv4' in values) and (values['ipv4'] != False):
                             if current_ipv4:
