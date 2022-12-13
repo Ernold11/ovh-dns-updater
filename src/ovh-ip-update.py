@@ -177,31 +177,32 @@ class OVHIpUpdate:
             try:
                 for host, values in self.settings["hosts"].items():
                     domain = values["domain"]
-                    subdomain = values["subdomain"]
-                    if ('ipv4' not in values) or (values['ipv4'] != False):
-                        if current_ipv4:
-                            ttl = self.settings["default_ttl"] if (
-                                'ttl' not in values) else values['ttl']
-                            self.update_record(
-                                domain, subdomain, current_ipv4, _ttl=ttl)
+                    for subdomain in values["subdomains"]:
+                        self.log("Updating {} subdomain".format(subdomain))
+                        if ('ipv4' in values) and (values['ipv4'] != False):
+                            if current_ipv4:
+                                ttl = self.settings["default_ttl"] if (
+                                    'ttl' not in values) else values['ttl']
+                                self.update_record(
+                                    domain, subdomain, current_ipv4, _ttl=ttl)
+                            else:
+                                self.delete_record(domain, subdomain, 'A')
                         else:
-                            self.delete_record(domain, subdomain, 'A')
-                    else:
-                        self.log("Not touching A record for {}.{}, as instructed".format(
-                            subdomain, domain))
-                        pass
-                    if ('ipv6' not in values) or (values['ipv6'] != False):
-                        if current_ipv6:
-                            ttl = self.settings["default_ttl"] if (
-                                'ttl' not in values) else values['ttl']
-                            self.update_record(
-                                domain, subdomain, current_ipv6, _ttl=ttl)
+                            self.log("Not touching A record for {}.{}, as instructed".format(
+                                subdomain, domain))
+                            pass
+                        if ('ipv6' in values) and (values['ipv6'] != False):
+                            if current_ipv6:
+                                ttl = self.settings["default_ttl"] if (
+                                    'ttl' not in values) else values['ttl']
+                                self.update_record(
+                                    domain, subdomain, current_ipv6, _ttl=ttl)
+                            else:
+                                self.delete_record(domain, subdomain, 'AAAA')
                         else:
-                            self.delete_record(domain, subdomain, 'AAAA')
-                    else:
-                        self.log("Not touching AAAA record for {}.{}, as instructed".format(
-                            subdomain, domain))
-                        pass
+                            self.log("Not touching AAAA record for {}.{}, as instructed".format(
+                                subdomain, domain))
+                            pass
                 # all self.settings["hosts"] records have been updated without errors, log change and save current addresses
                 self.log("new addresses {} ; {} -- {} records updates".format(
                     current_ipv4, current_ipv6, self.record_changed))
