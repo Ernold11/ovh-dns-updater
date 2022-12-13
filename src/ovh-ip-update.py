@@ -16,6 +16,7 @@ class OVHIpUpdate:
         self.record_changed = 0
         self.settings = self.load_config()
         self.logger = self.get_logger("/tmp/ovh-dns-updater.log")
+        self.supervisord_logger = self.get_logger("/dev/fd/1")
         self.client = ovh.Client(**self.settings["ovh"])
 
     def get_logger(self, path):
@@ -82,6 +83,7 @@ class OVHIpUpdate:
 
     def log(self, msg):
         self.logger.info(msg)
+        self.supervisord_logger.info(msg)
 
     def update_record(self, domain, subdomain, new_ip, _ttl=600):
         # Update the (A or AAAA) record with the provided IP
