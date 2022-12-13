@@ -52,6 +52,7 @@ class OVHIpUpdate:
             self.update_record_if_needed()
             self.log("Sleep {}s".format(sleep_time))
             time.sleep(sleep_time)
+            self.log("#"*80)
 
     def get_current_ip(self, v=4):
         if v == 4:
