@@ -184,7 +184,7 @@ class OVHIpUpdate:
                     domain = values["domain"]
                     for subdomain in values["subdomains"]:
                         self.log("#"*80)
-                        self.log("Updating {} subdomain".format(subdomain))
+                        self.log("Updating '{}' subdomain".format(subdomain))
                         if ('ipv4' in values) and (values['ipv4'] != False):
                             if current_ipv4:
                                 ttl = self.settings["default_ttl"] if (
