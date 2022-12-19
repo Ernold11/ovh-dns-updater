@@ -8,6 +8,7 @@ RUN python3 -m pip install -r requirements.txt
 
 RUN mkdir /src/
 COPY src/ovh-ip-update.py /src/
+COPY src/app.py /src/
 
 RUN mkdir /src/config
 COPY supervisord.conf /etc/
