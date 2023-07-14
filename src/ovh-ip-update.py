@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import logging
 import os
 import sys
@@ -14,7 +15,16 @@ import yaml
 
 
 class OVHIpUpdate:
-    def __init__(self) -> None:
+    def __init__(self, config_file=None) -> None:
+        if config_file is None:
+            self.conf_file_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "config",
+                "conf.yaml",
+            )
+        else:
+            self.conf_file_path = config_file
+
         self.current_ip_file = "/tmp/current_ip.yaml"  # nosec
         self.record_changed = 0
         self.settings = self.load_config()
@@ -43,23 +53,19 @@ class OVHIpUpdate:
         return logger
 
     def load_config(self):
-        conf_file_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "config", "conf.yaml"
-        )
-
-        with open(conf_file_path) as conf_file:
+        with open(self.conf_file_path) as conf_file:
             return yaml.safe_load(conf_file)
 
-    def run(self):
-        sleep_time_str = os.getenv("SLEEP_TIME") or "300"
-        sleep_time = int(sleep_time_str)
+    def run(self, sleep_time: int | None = None):
         while True:
             self.update_record_if_needed()
+            if sleep_time is None:
+                break
             self.log(f"Sleep {sleep_time}s")
             time.sleep(sleep_time)
             self.log("#" * 70)
 
-    def get_current_ip(self, v=4) -> str | Literal[False]:
+    def get_current_ip(self, v: int = 4) -> str | Literal[False]:
         if v == 4:
             url_list = [
                 "https://api.ipify.org",
@@ -97,7 +103,9 @@ class OVHIpUpdate:
     def log(self, msg) -> None:
         self.logger.info(msg)
 
-    def update_record(self, domain, subdomain, new_ip, _ttl=600) -> None:
+    def update_record(
+        self, domain: str, subdomain: str, new_ip: str, _ttl=600
+    ) -> None:
         # Update the (A or AAAA) record with the provided IP
 
         typ = "AAAA" if ":" in new_ip else "A"
@@ -144,10 +152,10 @@ class OVHIpUpdate:
                 f"Error updating {subdomain}.{domain} with {new_ip}"
             )
 
-    def delete_record(self, domain, subdomain, typ):
+    def delete_record(self, domain: str, subdomain: str, typ: str):
         """
-        if it exists, delete an A or AAAA record
-        (because the corresponding IP is not available)
+        Delete an A or AAAA record, if it exists.
+        (Typically because the corresponding IP is not available)
         """
         self.log(f"checking record {typ} for {subdomain}.{domain}")
         result = self.client.get(
@@ -167,12 +175,21 @@ class OVHIpUpdate:
         self.log(f"current ips: {current_ipv4} ; {current_ipv6}")
 
         # reload saved values & compare
+        need_update = False
         try:
-            with open(self.current_ip_file) as _file:
-                old_time, old_ipv4, old_ipv6 = yaml.safe_load(_file)
-            need_update = (old_ipv4 != current_ipv4) or (
-                old_ipv6 != current_ipv6
-            )
+            conf_time = os.path.getmtime(self.conf_file_path)
+            ip_time = os.path.getmtime(self.current_ip_file)
+            if ip_time < conf_time:
+                need_update = True
+
+            if not need_update:
+                with open(self.current_ip_file) as _file:
+                    old_time, old_ipv4, old_ipv6 = yaml.safe_load(_file)
+
+                    if (old_ipv4 != current_ipv4) or (
+                        old_ipv6 != current_ipv6
+                    ):
+                        need_update = True
         except OSError:
             self.log("No old ips recorded")
             need_update = True
@@ -233,5 +250,26 @@ class OVHIpUpdate:
 
 
 if __name__ == "__main__":
-    update = OVHIpUpdate()
-    update.run()
+    parser = argparse.ArgumentParser(
+        description="Maintain OVH-DNS records (A and AAAA)"
+    )
+    parser.add_argument(
+        "--config-file", default=None, help="Path to configuration file"
+    )
+    parser.add_argument(
+        "--sleep-time",
+        default=None,
+        type=int,
+        help="Run as daemon, sleep X seconds between checks",
+    )
+    args = parser.parse_args()
+
+    sleep_time_str = os.getenv("SLEEP_TIME")
+    if args.sleep_time is None:
+        if sleep_time_str is not None:
+            # Run as Daemon when sleep time is provided.
+            args.sleep_time = int(sleep_time_str)
+
+    ovhUpdater = OVHIpUpdate(config_file=args.config_file)
+
+    ovhUpdater.run(sleep_time=args.sleep_time)
