@@ -119,6 +119,8 @@ repos:
         additional_dependencies:
           - ovh
           - requests
+          - PyYAML
+          - flask
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.4.1
     hooks:
@@ -133,3 +135,5 @@ repos:
         additional_dependencies:
           - ovh
           - requests
+          - types-PyYAML
+          - types-flask

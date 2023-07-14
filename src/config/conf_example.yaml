@@ -1,21 +1,43 @@
-# Should missing IP address being considered as error (Depend on the ISP, internet box settings...)?
-# In case a required IP cannot be obtained, the script will send an email and stop without updating anything.
-# If, for any reason, IPv4 or IPv6 address cannot be obtained and if it is not protected by this list, the corresponding records will be deleted for all hosts.
-ip_versions_required: [4] # MUST not be empty. Can be [4],[6] or [4,6]
-default_ttl:  0  # seconds
-# ttl = how long will a DNS server cache the value before checking it at the Registrar. Longer value yields faster name resolution most of the time, but less frequent updates
-checkDNS_interval_hrs: 12.1 # when the saved IP addresses are old, check the DNS record, even if the addresses did not change
-# list of hosts (=subdomain.domain.tld) to update, each a dictionnary with at least "domain" and "subdomain" defined
-hosts: 
-    host_1:
-        domain: "host", # Required
-        subdomains: [""], # Required. list of subdomains or one element list "" (for @) or "*" for wildcard
-        #"ipv6": any_value_except_False # Optional : maintain corresponding record, when possible
-        ipv4: True, #explicitly disable modifiying ipv4 (A) records, even if public IPV4 exists (a possibly erroneous record would be left as-is)
-        #"ttl": 60 # optional : if 'ttl' in specified in host, overrides the global default value
-    
+---
+# Should missing IP address being considered as error
+#   (Depends on the ISP, internet box settings...)?
+# In case a required IP cannot be obtained, the script will send an email
+#   and stop without updating anything.
+# If, for any reason, IPv4 or IPv6 address cannot be obtained and if it
+#  is not protected by this list, the corresponding records will be deleted
+#  for all hosts.
+ip_versions_required: [4]  # MUST not be empty. Can be [4],[6] or [4,6]
+
+# ttl = how long will a DNS server cache the value before checking it at
+#   the Registrar. Longer value yields faster name resolution most of the time,
+#   but less frequent updates
+default_ttl: 0  # seconds
+
+# Periodic check interval.
+#   When the saved IP addresses are old, check the DNS record, even if the
+#   addresses did not change
+checkDNS_interval_hrs: 12.1
+# list of hosts (=subdomain.domain.tld) to update, each a dictionary with
+#   at least "domain" and "subdomain" defined
+hosts:
+  host_1:
+    domain: host  # Required
+
+    # List of subdomains or one element list "" (for @) or "*" for wildcard
+    subdomains: ['']  # Required.
+
+    # Maintain IPV6 record, when possible
+    # "ipv6": any_value_except_False  # Optional
+
+    # Explicitly disable modifying ipv4 (A) records,
+    #   even if public IPV4 exists
+    #   (a possibly erroneous record would be left as-is)
+    ipv4: true
+
+    # Override the global default TTL value, if 'ttl' in specified in host
+    # "ttl": 60  # Optional
 ovh:
-        endpoint: "ovh-eu",
-        application_key: "aaaaaaaaaaaaa",
-        application_secret: "bbbbbbbbbbbbbbbbbbbbbbbbb",
-        consumer_key: "ccccccccccccccccccccccccc"
+  endpoint: ovh-eu
+  application_key: aaaaaaaaaaaaa
+  application_secret: bbbbbbbbbbbbbbbbbbbbbbbbb
+  consumer_key: ccccccccccccccccccccccccc
