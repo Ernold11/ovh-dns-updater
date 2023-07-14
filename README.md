@@ -61,9 +61,8 @@ this script needs extra modules: `pip install ovh requests`
 
 In order to access the OVH API from this script, you need to generate API
 access keys at this site
-[https://eu.api.ovh.com/createToken/](https://eu.api.ovh.com/createToken/)\
-(or
-use another access point relevant for your OVH subscription)
+[https://eu.api.ovh.com/createToken/](https://eu.api.ovh.com/createToken/)
+(or use another access point relevant for your OVH subscription).
 
 Provide your OVH login and password, a script name, a purpose, a validity
 duration for the keys and ask for the four permissions:
@@ -75,14 +74,19 @@ POST /domain/zone/*
 DELETE /domain/zone/* (optional, since should rarely be useful)
 ```
 
-This will allow the script to
+[This link for ovh-eu should help you create a token](https://www.ovh.com/auth/api/createToken?validity=0&GET=/domain/zone/*&POST=/domain/zone/*&PUT=/domain/zone/*&DELETE=/domain/zone/*/record/*)
+that also allows you to use it for DNS modifications during ACME (Let's
+encrypt) certificate generation.
+
+The credentials will allow the script to
 
 - read the statuses of your domains/subdomains (GET)
 - update records (PUT)
 - create inexistent records and refresh (POST)
 - delete record if the ipv6 or ipv4 address no longer exists
 
-The keys delivered should be inserted in the script.
+The keys delivered should be inserted in the script, in the environment, or
+ovh.conf file.
 
 Other config parameters (domain names etc.) are also setup directly inside
 the script. See explanations in the code.

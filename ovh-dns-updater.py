@@ -26,7 +26,24 @@ client_kwargs = {
 
 # -or in the ENVIRONMENT
 # -or in a ovh.conf file
-# in which cases we can call with no argument (the ovh module gets the credentials on its own):
+# in which case we can call with no argument (the ovh module gets the credentials on its own):
+
+# file ovh.conf eg :
+# ```
+# [default]
+# ; general configuration: default endpoint
+# endpoint=ovh-eu
+#
+# [ovh-eu]
+# ; configuration specific to 'ovh-eu' endpoint
+# application_key=my_app_key
+# application_secret=my_application_secret
+# consumer_key=my_consumer_key
+#
+# file location defaults : Current working directory: ./ovh.conf
+# Current user's home directory ~/.ovh.conf
+# System wide configuration /etc/ovh.conf
+# ```
 
 if client_kwargs["application_key"] == "XXXXXXXXXXXXXXXX":
     # Credentials are not set in this file
@@ -40,6 +57,7 @@ else:
 ip_versions_required = [4]  # MUST not be empty. Can be [4],[6] or [4,6]
 
 default_ttl = 600  # seconds
+
 # ttl = how long will a DNS server cache the value before checking it at the Registrar. Longer value yields faster name resolution most of the time, but less frequent updates
 
 # list of hosts (=subdomain.domain.tld) to update, each a dictionary with at least "domain" and "subdomain" defined
