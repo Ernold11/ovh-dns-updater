@@ -4,7 +4,7 @@ exclude: ^(\.[^/]*cache/.*|.*/_user.py)$
 repos:
   - repo: https://github.com/executablebooks/mdformat
     # Do this before other tools "fixing" the line endings
-    rev: 0.7.16
+    rev: 0.7.17
     hooks:
       - id: mdformat
         name: Format Markdown
@@ -21,8 +21,9 @@ repos:
           - mdformat-black
           - mdformat-web
           - mdformat-gfm
+          - setuptools
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       # - id: no-commit-to-branch
       #   args: [--branch, main]
@@ -43,7 +44,7 @@ repos:
       - id: check-case-conflict
       # - id: check-toml
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: v1.35.1
     hooks:
       - id: yamllint
         args:
@@ -54,14 +55,16 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
+        additional_dependencies:
+          - setuptools
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.9.0
+    rev: v3.15.1
     hooks:
       - id: pyupgrade
         args:
           - --py37-plus
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 24.2.0
     hooks:
       - id: black
         args:
@@ -75,7 +78,7 @@ repos:
         args: [--skip, 'B101,B311,B320,B410', --recursive, .]
 
   - repo: https://github.com/fsouza/autoflake8
-    rev: v0.4.0
+    rev: v0.4.1
     hooks:
       - id: autoflake8
         args:
@@ -84,7 +87,7 @@ repos:
           - --expand-star-imports
           - .
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
+    rev: 7.0.0
     hooks:
       - id: flake8
         args: [ '--builtins=_' ]
@@ -97,11 +100,11 @@ repos:
           - pycodestyle>=2.8.0
           - pyflakes>=2.4.0
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.5
+    rev: v2.2.6
     hooks:
       - id: codespell
         args:
@@ -110,8 +113,8 @@ repos:
           - --ignore-words-list=hass,master
           - --skip="./.*"
           - --quiet-level=2
-  - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v3.0.0a5
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v3.0.3
     hooks:
       - id: pylint
         # Check configuration using `pylint --generate-rcfile`
@@ -121,8 +124,9 @@ repos:
           - requests
           - PyYAML
           - flask
+          - regex
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.4.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         args:
