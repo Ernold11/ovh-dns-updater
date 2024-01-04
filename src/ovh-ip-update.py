@@ -148,7 +148,7 @@ class OVHIpUpdate:
         result = self.client.get(f"/domain/zone/{domain}/record/{record_id}")
         if new_ip != result["target"]:
             self.record_changed -= 1
-            raise Exception(
+            raise RuntimeError(
                 f"Error updating {subdomain}.{domain} with {new_ip}"
             )
 

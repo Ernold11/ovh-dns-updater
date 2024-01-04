@@ -19,8 +19,9 @@ def hello_world():
 <ul class="list-group">
 """
 
-    for line in lines:
-        msg += f'<li class="list-group-item">{line}</li>'
+    msg += msg.join(
+        [f'<li class="list-group-item">{line}</li>' for line in lines]
+    )
 
     msg += "</ul>"
 
