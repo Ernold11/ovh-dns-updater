@@ -2,12 +2,13 @@ from flask import Flask
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def hello_world():
-    with open("/tmp/ovh-dns-updater.log", "r") as fp:
+    with open("/tmp/ovh-dns-updater.log") as fp:  # nosec
         lines = fp.readlines()[-25::]
 
-    msg = '''
+    msg = """
 <head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 
@@ -16,10 +17,11 @@ def hello_world():
 
 </head>
 <ul class="list-group">
-'''
+"""
 
-    for line in lines:
-        msg += '<li class="list-group-item">{}</li>'.format(line)
+    msg += msg.join(
+        [f'<li class="list-group-item">{line}</li>' for line in lines]
+    )
 
     msg += "</ul>"
 

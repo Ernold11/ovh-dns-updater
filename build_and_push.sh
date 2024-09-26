@@ -1,20 +1,20 @@
 #!/bin/bash
-  
-image="ernold11/ovh-dns-updater"  
-  
+
+image="ernold11/ovh-dns-updater"
+
 # Set the timestamp
-timestamp=$(date +%Y.%m.%d.%H%M%S)  
-  
-tag=$image:$timestamp  
-latest=$image:latest  
-  
+timestamp=$(date +%Y.%m.%d.%H%M%S)
+
+tag=$image:$timestamp
+latest=$image:latest
+
 # Build the image -- tagged with the timestamp.
-docker build -t $tag -t $latest .  
-  
+docker build -t $tag -t $latest .
+
 # Push with the timestamped tag, and latest image tag to Docker Hub.
 docker login
 docker push $tag
 docker push $latest
-  
+
 # Cleanup
 docker system prune -f
